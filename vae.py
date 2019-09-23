@@ -2,7 +2,7 @@ import numpy as np
 
 import torch
 from torch import nn
-from torch.nn import F
+from torch.nn import functional as F
 from torch.autograd import Variable
 
 
@@ -23,10 +23,10 @@ class VAE(nn.Module):
 
 	def forward(self, x):
 		mean, log_var = self.encoder(x)
-		noise = sample_latent_noise(mean, log_var)
+		noise = self.sample_latent_noise(mean, log_var)
 		output = self.decoder(noise)
 		return output, mean, log_var
 
 	def inference(self, number):
 		normal_noise = Variable(torch.randn([number, self.latent_dim])).cuda()
-		return self.decoder(nosie)
+		return self.decoder(normal_noise)

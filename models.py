@@ -34,7 +34,7 @@ class Encoder(nn.Module):
 
 class Decoder(nn.Module):
 	def __init__(self, output_dim, args):
-		super(Encoder, self).__init__()
+		super(Decoder, self).__init__()
 
 		self.args = args
 		self.latent_dim = args.latent_dim
@@ -43,12 +43,12 @@ class Decoder(nn.Module):
 		if args.model == 'simple': # only have the simplest model for now
 			self.layer = nn.Linear(args.latent_dim, args.channels)
 
-		self.ouput_layer = nn.Linear(args.channels, ouput_dim)
+		self.output_layer = nn.Linear(args.channels, output_dim)
 
 	def forward(self, x):
 		if self.args.model == 'simple':
 			x = F.relu(self.layer(x))
 
-		output = self.output_layer(x)
+		output = torch.sigmoid(self.output_layer(x))
 
 		return output

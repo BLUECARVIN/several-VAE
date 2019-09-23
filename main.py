@@ -24,16 +24,17 @@ from torchvision import transforms
 def main(args):
 
 	if args.data == 'MNIST':
+
 		data_path = '/home/szchen/Datasets/'
 
 		input_dim = 28 * 28
 
 		transform = transforms.Compose([transforms.ToTensor()])
 		mnist = torchvision.datasets.MNIST(data_path, download=False, transform=transform, train=True)
-		dataloader = torch.utils.data.DataLoader(mnist, batch_size=batch_size, shuffle=True)
+		dataloader = torch.utils.data.DataLoader(mnist, batch_size=args.batch_size, shuffle=True)
 
 	encoder = Encoder(input_dim=input_dim, args=args)
-	decoder = Decoder(output_dim=output_dim, args=args)
+	decoder = Decoder(output_dim=input_dim, args=args)
 
 	model = VAE(encoder=encoder, decoder=decoder, args=args).cuda()
 	optimizer = optim.Adam(model.parameters(), lr=args.lr)
@@ -49,7 +50,7 @@ def main(args):
 			predict_, z_mean, z_log_var = model(input_data)
 
 			optimizer.zero_grad()
-			loss = cal_loss(predict_, input_data, z_mean, z_log_var)
+			loss = cal_loss(predict_, input_data, z_mean, z_log_var, args)
 			epoch_loss.append(loss.cpu().data)
 
 			loss.backward()
@@ -59,7 +60,7 @@ def main(args):
 
 		if args.save_fig != None and (epoch + 1) % args.save_fig == 0:
 			test_image = model.inference(16)
-			test_image = test_image.view(-1, 28, 28).cpu().numpy()
+			test_image = test_image.view(-1, 28, 28).detach().cpu().numpy()
 			utils.save_image(test_image, 'Epoch:{}.png'.format(epoch))
 
 	if args.save_paras:
@@ -81,6 +82,10 @@ if __name__ == '__main__':
 	parser.add_argument('--channels', type=int, default=256)
 	parser.add_argument('--save_fig', type=int, default=1)
 	parser.add_argument('--save_paras', type=bool, default=True)
+	parser.add_argument('--loss', type=str, default='origin')
+	parser.add_argument('--data', type=str, default='MNIST')
+
+	args = parser.parse_args()
 
 	main(args)
 
