@@ -74,8 +74,15 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--model', type=str, default='simple')
+	parser.add_argument('--max_epoch', type=int, default=15)
+	parser.add_argument('--batch_size', type=int, default=64)
+	parser.add_argument('--lr', type=float, default=1e-3)
+	parser.add_argument('--latent_dim', type=int, default=2)
+	parser.add_argument('--channels', type=int, default=256)
+	parser.add_argument('--save_fig', type=int, default=1)
+	parser.add_argument('--save_paras', type=bool, default=True)
 
-	main()
+	main(args)
 
 
 
