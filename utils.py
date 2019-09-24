@@ -12,7 +12,6 @@ def cal_loss(predict, groundtruth, z_mean, z_log_var, args):
 	KL_Loss = -0.5 * torch.sum(1 + z_log_var - z_mean.pow(2) - torch.exp(z_log_var))
 
 	if args.loss == 'origin':
-		addition_Loss = nn.BCELoss(reduction='sum')
 		A_Loss = F.binary_cross_entropy(predict.view(-1, 28*28), groundtruth.view(-1, 28*28), reduction='sum')
 
 		
