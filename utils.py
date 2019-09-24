@@ -9,14 +9,20 @@ from matplotlib import pyplot as plt
 
 def cal_loss(predict, groundtruth, z_mean, z_log_var, args):
 	# print(predict.shape, groundtruth.shape)
+	KL_Loss = -0.5 * torch.sum(1 + z_log_var - z_mean.pow(2) - torch.exp(z_log_var))
+
 	if args.loss == 'origin':
-		BCE = nn.BCELoss(reduction='sum')
+		addition_Loss = nn.BCELoss(reduction='sum')
+		A_Loss = F.binary_cross_entropy(predict.view(-1, 28*28), groundtruth.view(-1, 28*28), reduction='sum')
 
-		KL_Loss = -0.5 * torch.sum(1 + z_log_var - z_mean.pow(2) - torch.exp(z_log_var))
-		BCE_Loss = F.binary_cross_entropy(predict.view(-1, 28*28), groundtruth.view(-1, 28*28), reduction='sum')
+		
 
-		loss = (KL_Loss + BCE_Loss) / predict.shape[0]
-		return loss
+	if args.loss == 'MSE':
+		addition_Loss = nn.MSELoss(reduction='sum')
+		A_Loss = addition_Loss(predict, groundtruth)
+
+	loss = (KL_Loss + A_Loss) / predict.shape[0]
+	return loss
 
 
 def draw_loss_curve(loss):
